@@ -6,11 +6,9 @@ import se.lth.cs.eda040.fakecamera.AxisM3006V;
 public class Read implements Runnable {
     private Monitor monitor;
     private AxisM3006V camera;
-    private int port;
 
-    public Read(Monitor monitor, int port) {
+    public Read(Monitor monitor) {
         this.monitor = monitor;
-        this.port = port;
         camera = new AxisM3006V();
         camera.init();
         camera.setProxy("argus-1.student.lth.se", 5555);
