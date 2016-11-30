@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import common.Image;
 
 public class HttpServer implements Runnable {
     private Monitor monitor;
@@ -22,6 +23,7 @@ public class HttpServer implements Runnable {
             final int portNumber = 7654;
             ServerSocket serverSocket = new ServerSocket(portNumber);
             System.out.println("Camera HTTP server on port " + portNumber);
+            Image lastImage = null;
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
@@ -49,7 +51,9 @@ public class HttpServer implements Runnable {
                 final boolean indexExists = new File(indexPath).isFile();
                 writeln(out, "HTTP/1.0 200 OK");
                 if (!indexExists || request.substring(4, 10).equals("/image")) {
-                    byte[] imageData = monitor.getImage().getData();
+                	Image image = monitor.getImage(lastImage);
+                	lastImage = image;
+                    byte[] imageData = image.getData();
                     writeln(out, "Content-Length: " + imageData.length);
                     writeln(out, "Content-Type: image/jpeg");
                     writeln(out, "Cache-Control: no-store");

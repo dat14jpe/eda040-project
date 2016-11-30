@@ -22,10 +22,9 @@ public class Read implements Runnable {
         while (true) {
             int length = camera.getJPEG(data, 0);
             boolean motion = camera.motionDetected();
-
             byte[] imgData = new byte[length];
             System.arraycopy(data, 0, imgData, 0, length);
-            monitor.putImage(new Image(0, 0, imgData));
+            monitor.putImage(new Image(System.currentTimeMillis(), 0, imgData, motion));
         }
     }
 }

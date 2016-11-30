@@ -1,13 +1,7 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class Server {
     public static void main(String[] args) {
@@ -22,6 +16,7 @@ public class Server {
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 monitor.setSocket(clientSocket);
+                // - to do: wait (or does next iteration's accept()-call take care of that?)
                 //clientSocket.close();
             }
         } catch (Exception e) {
