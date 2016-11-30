@@ -18,13 +18,13 @@ public class In implements Runnable {
                 InputStream in = socket.getInputStream();
                 int packetType = in.read();
                 if (Monitor.PACKET_C2S != packetType) {
-                    System.out.println("Server error: wrong packet type");
+                    System.out.println("Server error: wrong packet type (" + packetType + ")");
                     continue;
                 }
                 int mode = in.read();
                 monitor.setMode(mode);
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                //e.printStackTrace();
             }
         }
     }

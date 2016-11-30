@@ -11,7 +11,7 @@ public class Read implements Runnable {
         this.monitor = monitor;
         camera = new AxisM3006V();
         camera.init();
-        camera.setProxy("argus-1.student.lth.se", 5555);
+        camera.setProxy("argus-3.student.lth.se", 5555);
         camera.connect();
     }
 

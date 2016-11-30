@@ -14,6 +14,7 @@ public class In implements Runnable {
 
     public In(Monitor monitor, Connection connection, int id) {
         this.monitor = monitor;
+        this.connection = connection;
         this.id = id;
     }
 
@@ -26,6 +27,7 @@ public class In implements Runnable {
         while (true) {
             try {
                 Socket socket = connection.getSocket();
+                
                 InputStream is = socket.getInputStream();
 
                 int packetType = is.read();
@@ -44,7 +46,7 @@ public class In implements Runnable {
                 
                 monitor.putImage(new Image(toInt(timestamp), this.id, imageData, mode == monitor.MODE_IDLE ? false : true));
             } catch (Exception e) {
-                throw new Error(e);
+                //throw new Error(e);
             }
         }
     }

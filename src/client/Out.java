@@ -35,7 +35,7 @@ public class Out implements Runnable {
                 os.write(toArr(1, monitor.PACKET_C2S));
                 os.write(toArr(1, this.mode));
             } catch (Exception e) {
-                throw new Error(e);
+                //throw new Error(e);
             }
         }
     }

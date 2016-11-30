@@ -8,6 +8,8 @@ public class Server {
         Monitor monitor = new Monitor();
         new Thread(new Read(monitor)).start();
         new Thread(new HttpServer(monitor)).start();
+        new Thread(new In(monitor)).start();
+        new Thread(new Out(monitor)).start();
 
         try {
             final int portNumber = 8765;

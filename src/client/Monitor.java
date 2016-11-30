@@ -13,6 +13,7 @@ public class Monitor {
 
 
     public Monitor() {
+        connections = new ArrayList<Connection>();
         this.minId = 1;
         this.mode = MODE_IDLE;
     }

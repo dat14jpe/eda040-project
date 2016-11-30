@@ -27,14 +27,16 @@ public class Out implements Runnable {
 
                 // Skip images if in idle mode.
                 final int TIME_LIMIT = 5000;
-                if (Monitor.MODE_IDLE == monitor.getMode() && timestamp - timeSent < TIME_LIMIT) {
+                if (false) {
+                //if (Monitor.MODE_IDLE == monitor.getMode() && timestamp - timeSent < TIME_LIMIT) {
                     continue;
                 }
 
                 timeSent = timestamp;
+                //System.out.println("SERVER sent image");
                 Protocol.writePacket(out, mode, timestamp, image);
             } catch (IOException e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }
