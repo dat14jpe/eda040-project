@@ -1,5 +1,6 @@
 package server;
 
+import common.Image;
 import se.lth.cs.eda040.fakecamera.AxisM3006V;
 
 public class Read implements Runnable {
@@ -21,7 +22,10 @@ public class Read implements Runnable {
         while (true) {
             int length = camera.getJPEG(data, 0);
             boolean motion = camera.motionDetected();
-            monitor.putImage(data, length);
+
+            byte[] imgData = new byte[length];
+            System.arraycopy(data, 0, imgData, 0, length);
+            monitor.putImage(new Image(0, 0, imgData));
         }
     }
 }
