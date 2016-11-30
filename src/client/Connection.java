@@ -1,6 +1,10 @@
 package client;
 
+import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
+
+import org.omg.CORBA_2_3.portable.OutputStream;
 
 public class Connection {
     private boolean connected;
@@ -8,26 +12,24 @@ public class Connection {
     private int port;
     private Monitor monitor;
     private Socket socket;
+    
+    private Thread in;
+    private Thread out;
 
     public Connection(String address, int port, Monitor monitor) {
         this.connected = false;
         this.address = address;
         this.port = port;
         this.monitor = monitor;
-    }
-
-    public synchronized void setSocket(Socket clientSocket) {
-        this.socket = clientSocket;
-        notifyAll();
-    }
-
-    public synchronized Socket getClientSocket() {
+        
         try {
-            while (null == socket)
-                wait();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            this.socket = new Socket(address, port);
+        } catch (Exception e) {
+            throw new Error(e);
         }
+        
+    }
+    public Socket getSocket() {
         return socket;
     }
 }
