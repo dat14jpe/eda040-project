@@ -12,7 +12,9 @@ public class Connection {
     private int port;
     private Monitor monitor;
     private Socket socket;
-    
+
+    private long timer;
+
     private Thread in;
     private Thread out;
 
@@ -21,14 +23,26 @@ public class Connection {
         this.address = address;
         this.port = port;
         this.monitor = monitor;
-        
+        this.timer = System.currentTimeMillis();
+
+        while (!connected) {
+            long delta = System.currentTimeMillis() - timer;
+            if (delta > 3000L) {
+                connect();
+            }
+        }
+    }
+
+    private void connect() {
+        this.timer = System.currentTimeMillis();
         try {
             this.socket = new Socket(address, port);
+            this.connected = true;
         } catch (Exception e) {
-            throw new Error(e);
+            e.printStackTrace();
         }
-        
     }
+
     public Socket getSocket() {
         return socket;
     }
