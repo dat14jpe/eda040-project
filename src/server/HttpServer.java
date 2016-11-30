@@ -22,6 +22,7 @@ public class HttpServer implements Runnable {
         try {
             final int portNumber = 7654;
             ServerSocket serverSocket = new ServerSocket(portNumber);
+            serverSocket.setReuseAddress(true);
             System.out.println("Camera HTTP server on port " + portNumber);
             Image lastImage = null;
             while (true) {

@@ -6,13 +6,13 @@ import java.net.Socket;
 public class Server {
     public static void main(String[] args) {
         Monitor monitor = new Monitor();
-        new Thread(new Read(monitor, 8765)).start();
+        new Thread(new Read(monitor)).start();
         new Thread(new HttpServer(monitor)).start();
 
         try {
-            final int portNumber = 7654;
+            final int portNumber = 8765;
             ServerSocket serverSocket = new ServerSocket(portNumber);
-            System.out.println("Camera HTTP server on port " + portNumber);
+            System.out.println("Camera server on port " + portNumber);
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 monitor.setSocket(clientSocket);
