@@ -1,28 +1,30 @@
 package server;
+import common.Image;
+import java.net.Socket;
 
 public class Monitor {
-    // Last image data.
-    private byte[] data;
-    private int length;
+	private Image image;
+	private Socket clientSocket;
 
     public Monitor() {
 
     }
 
-    public synchronized void putImage(byte[] data, int length) {
-        this.data = new byte[length];
-        System.arraycopy(data, 0, this.data, 0, length);
-        this.length = length;
+    public synchronized void putImage(Image image) {
+    	this.image = image;
         notifyAll();
     }
 
-    public synchronized byte[] getImage() {
+    public synchronized Image getImage() {
         try {
-            while (null == data)
-                wait();
+            while (null == image) wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return data;
+        return image;
+    }
+    
+    public synchronized void setSocket(Socket clientSocket) {
+    	
     }
 }
