@@ -51,8 +51,8 @@ public class HttpServer implements Runnable {
                 final boolean indexExists = new File(indexPath).isFile();
                 writeln(out, "HTTP/1.0 200 OK");
                 if (!indexExists || request.substring(4, 10).equals("/image")) {
-                	Image image = monitor.getImage(lastImage);
-                	lastImage = image;
+                    Image image = monitor.getImage(lastImage);
+                    lastImage = image;
                     byte[] imageData = image.getData();
                     writeln(out, "Content-Length: " + imageData.length);
                     writeln(out, "Content-Type: image/jpeg");
