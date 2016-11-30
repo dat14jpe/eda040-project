@@ -1,0 +1,18 @@
+<!DOCTYPE html>			
+<html>
+ <head>
+  <title>Web camera</title>
+ </head>
+ <body>
+  <h1>Web camera</h1>
+  <img id="image" src="image">
+  <script type="text/javascript">
+      function refreshImage() {
+          var img = document.getElementById("image");
+          img.src = "image#" + new Date().getTime();
+          setTimeout(refreshImage, 200);
+      }
+      refreshImage();
+  </script>
+ </body>
+</html>
