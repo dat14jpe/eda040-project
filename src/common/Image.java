@@ -1,7 +1,7 @@
 package common;
 
 public class Image {
-	private long timestamp;
+	private long timestamp, clientTime;
 	private int cameraId;
 	private byte[] data;
 	private boolean motion;
@@ -27,5 +27,13 @@ public class Image {
 	
 	public boolean getMotion() {
 		return motion;
+	}
+	
+	public long getClientTime() {
+	    return clientTime;
+	}
+	
+	public void setClientTime(long clientTime) {
+	    this.clientTime = clientTime;
 	}
 }

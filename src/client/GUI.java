@@ -19,13 +19,20 @@ import javax.swing.SwingConstants;
 
 class ButtonHandler implements ActionListener {
     GUI gui;
+    int mode;
+    Monitor monitor;
 
-    public ButtonHandler(GUI gui) {
+    public ButtonHandler(GUI gui, int mode, Monitor monitor) {
         this.gui = gui;
+        this.mode = mode;
+        this.monitor = monitor;
     }
 
     public void actionPerformed(ActionEvent evt) {
         System.out.println(evt.getActionCommand()); // string
+        
+        monitor.setMode(mode);
+        
     }
 }
 
@@ -83,9 +90,9 @@ public class GUI {
         // Buttons
         JButton idleButton = new JButton("Idle Mode");
         JButton movieButton = new JButton("Movie Mode");
-        idleButton.addActionListener(new ButtonHandler(this));
+        idleButton.addActionListener(new ButtonHandler(this, Monitor.MODE_IDLE, monitor));
         idleButton.setFont(new Font("Arial", Font.BOLD, 40));
-        movieButton.addActionListener(new ButtonHandler(this));
+        movieButton.addActionListener(new ButtonHandler(this, Monitor.MODE_MOVIE, monitor));
         movieButton.setFont(new Font("Arial", Font.BOLD, 40));
         frame.add(idleButton);
         frame.add(movieButton);
@@ -97,5 +104,16 @@ public class GUI {
         frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
 
         frame.setVisible(true);
+    }
+    
+    public void put(common.Image image) { //show mode?
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Image theImage = imagePanel1.getToolkit().createImage(image.getData());
+                imagePanel1.getToolkit().prepareImage(theImage,-1,-1,null);     
+                imagePanel1.icon.setImage(theImage);
+                imagePanel1.icon.paintIcon(imagePanel1, imagePanel1.getGraphics(), 5, 5);
+            }
+        });
     }
 }

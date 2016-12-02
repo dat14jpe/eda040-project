@@ -1,14 +1,17 @@
 package client;
 
 import common.Image;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Monitor {
     public final static int PACKET_S2C = 1, PACKET_C2S = 2, MODE_IDLE = 1, MODE_MOVIE = 2;
     private int minId;
     private int mode;
 
-    private ArrayList<Image> images;
+    private Queue<Image> images;
     private ArrayList<Connection> connections;
 
 
@@ -16,6 +19,7 @@ public class Monitor {
         connections = new ArrayList<Connection>();
         this.minId = 1;
         this.mode = MODE_IDLE;
+        images = new LinkedList<Image>();
     }
     public synchronized int getMode() {
         return mode;
@@ -23,6 +27,17 @@ public class Monitor {
     public synchronized void setMode(int mode) {
         this.mode = mode;
         notifyAll();
+    }
+    public synchronized int waitForModeChange() {
+        int latestMode = mode;
+        while (latestMode == mode) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return mode;
     }
     public synchronized void putImage(Image image) {
         images.add(image);
@@ -37,5 +52,16 @@ public class Monitor {
     }
     public synchronized ArrayList<Connection> getConnections() {
         return connections;
+    }
+    
+    public synchronized Image getImage() {
+        while (images.isEmpty()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return images.poll();
     }
 }

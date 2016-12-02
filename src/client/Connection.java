@@ -25,9 +25,10 @@ public class Connection {
         this.monitor = monitor;
         this.timer = System.currentTimeMillis();
 
+        final long delay = 0L;//3000L;
         while (!connected) {
             long delta = System.currentTimeMillis() - timer;
-            if (delta > 3000L) {
+            if (delta > delay) {
                 connect();
             }
         }

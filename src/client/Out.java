@@ -8,13 +8,11 @@ public class Out implements Runnable {
     private Monitor monitor;
     private Connection connection;
     private int id;
-    private int mode;
 
     public Out(Monitor monitor, Connection connection, int id) {
         this.monitor = monitor;
         this.connection = connection;
         this.id = id;
-        this.mode = monitor.getMode();
     }
     
     private byte[] toArr(int len, int value) {
@@ -27,13 +25,11 @@ public class Out implements Runnable {
         while(true) {
             Socket socket = connection.getSocket();
             try {
-                while (this.mode == monitor.getMode())
-                    wait();
-                System.out.println("Mode change");
-                this.mode = monitor.getMode();
+                int mode = monitor.waitForModeChange();
+                System.out.println("Mode change");          
                 OutputStream os = socket.getOutputStream();
-                os.write(toArr(1, monitor.PACKET_C2S));
-                os.write(toArr(1, this.mode));
+                os.write(monitor.PACKET_C2S);
+                os.write(mode);
             } catch (Exception e) {
                 //throw new Error(e);
             }

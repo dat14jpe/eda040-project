@@ -1,9 +1,9 @@
 package client;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 import common.Image;
 
@@ -33,7 +33,7 @@ public class In implements Runnable {
                 int packetType = is.read();
 
                 int mode = is.read();
-                monitor.setMode(mode);
+                //monitor.setMode(mode);
 
                 byte[] timestamp = new byte[8];
                 is.read(timestamp);
@@ -43,6 +43,14 @@ public class In implements Runnable {
 
                 byte[] imageData = new byte[toInt(dataLen)];
                 is.read(imageData);
+                
+                // - Testing.
+                if (false) {
+                    FileOutputStream fos = new FileOutputStream("testimage.jpg");
+                    fos.write(imageData);
+                    fos.close();
+                    Thread.sleep(2000);
+                }
                 
                 monitor.putImage(new Image(toInt(timestamp), this.id, imageData, mode == monitor.MODE_IDLE ? false : true));
             } catch (Exception e) {

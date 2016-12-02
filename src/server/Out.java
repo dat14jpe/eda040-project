@@ -15,20 +15,20 @@ public class Out implements Runnable {
 
     public void run() {
         Image lastImage = null;
+        long timeSent = 0;
         while (true) {
             Image image = monitor.getImage(lastImage);
             lastImage = image;
             Socket socket = monitor.getClientSocket();
-            long timeSent = 0;
             try {
                 OutputStream out = socket.getOutputStream();
                 int mode = image.getMotion() ? Monitor.MODE_MOVIE : Monitor.MODE_IDLE;
                 long timestamp = System.currentTimeMillis();
 
                 // Skip images if in idle mode.
-                final int TIME_LIMIT = 5000;
-                if (false) {
-                //if (Monitor.MODE_IDLE == monitor.getMode() && timestamp - timeSent < TIME_LIMIT) {
+                final long TIME_LIMIT = 5000L;
+                
+                if (Monitor.MODE_IDLE == monitor.getMode() && timestamp - timeSent < TIME_LIMIT) {
                     continue;
                 }
 

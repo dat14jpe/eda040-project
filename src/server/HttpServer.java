@@ -1,14 +1,13 @@
 package server;
 
-import java.io.BufferedReader;
-import java.io.File;
+/*import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;*/
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import common.Image;
 
 public class HttpServer implements Runnable {
@@ -28,14 +27,14 @@ public class HttpServer implements Runnable {
             while (true) {
                 try {
                     Socket clientSocket = serverSocket.accept();
-                    BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    InputStream in = clientSocket.getInputStream();
                     OutputStream out = clientSocket.getOutputStream();
     
                     // Read request.
                     String request, inputLine;
-                    request = inputLine = in.readLine();
+                    request = inputLine = readln(in);
                     while (inputLine != null && !inputLine.equals("")) {
-                        inputLine = in.readLine();
+                        inputLine = readln(in);
                     }
     
                     // See that it is a GET request.
@@ -50,7 +49,7 @@ public class HttpServer implements Runnable {
                     // - Since this is extra functionality, we will default to
                     // just showing the image directly if there is no index.html.
                     final String indexPath = "web/index.html";
-                    final boolean indexExists = new File(indexPath).isFile();
+                    final boolean indexExists = false;//new File(indexPath).isFile();
                     writeln(out, "HTTP/1.0 200 OK");
                     if (!indexExists || request.substring(4, 10).equals("/image")) {
                         Image image = monitor.getImage(lastImage);
@@ -62,7 +61,7 @@ public class HttpServer implements Runnable {
                         writeln(out, "");
                         out.write(imageData);
                     } else {
-                        String content = new String(Files.readAllBytes(Paths.get("web/index.html")));
+                        String content = "";//readTextFile("web/index.html");
                         writeln(out, "Content-Length: " + content.length());
                         writeln(out, "Content-Type: text/html; charset=utf-8");
                         writeln(out, "");
@@ -71,7 +70,7 @@ public class HttpServer implements Runnable {
     
                     out.flush();
                     clientSocket.close();
-                } catch (IOException e) {
+                } catch (Exception e) {
                     continue;
                 }
             }
@@ -80,9 +79,44 @@ public class HttpServer implements Runnable {
         }
     }
 
+    private String readln(InputStream in) throws IOException {
+        boolean done = false;
+        String result = "";
+
+        while(!done) {
+            int ch = in.read();        // Read
+            if (ch <= 0 || ch == 10) {
+                // Something < 0 means end of data (closed socket)
+                // ASCII 10 (line feed) means end of line
+                done = true;
+            }
+            else if (ch >= ' ') {
+                result += (char)ch;
+            }
+        }
+
+        return result;
+    }
+    
     private void writeln(OutputStream out, String s) throws IOException {
         final byte[] CRLF = { '\r', '\n' };
         out.write(s.getBytes());
         out.write(CRLF);
     }
+    
+    /*private static String readTextFile(String fileName) throws IOException {
+        InputStream is = new FileInputStream(fileName);
+        BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+                
+        String line = buf.readLine();
+        StringBuilder sb = new StringBuilder();
+                
+        while(line != null){
+           sb.append(line).append("\r\n");
+           line = buf.readLine();
+        }
+                
+        buf.close();
+        return sb.toString();
+    }*/
 }
