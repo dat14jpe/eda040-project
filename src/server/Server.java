@@ -8,7 +8,7 @@ import java.net.*;
 public class Server {
     public static void main(String[] args) {
         final int httpPort = 7654, port = 8765;
-        
+
         Monitor monitor = new Monitor();
         new Thread(new Read(monitor)).start();
         new Thread(new HttpServer(monitor, httpPort)).start();
@@ -20,9 +20,14 @@ public class Server {
             serverSocket = new ServerSocket(port);
             System.out.println("Camera server on port " + port);
             while (true) {
-                monitor.setSocket(serverSocket.accept());
-                // - to do: wait (or does next iteration's accept()-call take
-                // care of that?)
+                monitor.reset();
+                try {
+                    monitor.setSocket(serverSocket.accept());
+                    // - to do: wait (or does next iteration's accept()-call take
+                    // care of that?)
+                } catch (Exception e) {
+                    continue;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

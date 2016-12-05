@@ -29,9 +29,7 @@ class ButtonHandler implements ActionListener {
 
     public void actionPerformed(ActionEvent evt) {
         System.out.println(evt.getActionCommand()); // string
-        
-        monitor.setMode(mode);
-        
+        monitor.forceMode(mode);
     }
 }
 
@@ -60,6 +58,7 @@ public class GUI {
     private Monitor monitor;
     private ImagePanel imagePanel1;
     private ImagePanel imagePanel2;
+    private JLabel statusLabel;
 
     public GUI(Monitor monitor) {
         this.monitor = monitor;
@@ -91,12 +90,19 @@ public class GUI {
         // Buttons
         JButton idleButton = new JButton("Idle Mode");
         JButton movieButton = new JButton("Movie Mode");
+        JButton autoButton = new JButton("Automatic Mode");
         idleButton.addActionListener(new ButtonHandler(this, Monitor.MODE_IDLE, monitor));
         idleButton.setFont(new Font("Arial", Font.BOLD, 40));
         movieButton.addActionListener(new ButtonHandler(this, Monitor.MODE_MOVIE, monitor));
         movieButton.setFont(new Font("Arial", Font.BOLD, 40));
+        autoButton.addActionListener(new ButtonHandler(this, Monitor.MODE_AUTO, monitor));
+        autoButton.setFont(new Font("Arial", Font.BOLD, 40));
         frame.add(idleButton);
         frame.add(movieButton);
+        frame.add(autoButton);
+
+        statusLabel = new JLabel("Hello?", SwingConstants.CENTER);
+        frame.add(statusLabel);
 
         frame.pack();
 
@@ -106,25 +112,24 @@ public class GUI {
 
         frame.setVisible(true);
     }
-    
-    static int n = 0;
-    
+
+    int n = 0;
+    long lastT = System.currentTimeMillis();
+
     public void put(common.Image image) { //show mode?
         class ImagePutter implements Runnable {
             private common.Image image;
-            
+
             public ImagePutter(common.Image image) {
                 this.image = image;
             }
-            
+
             public void run() {
+                long t = System.currentTimeMillis();
+                double fps = 1000.0 / (t - lastT);
+                lastT = t;
+                statusLabel.setText("Frame " + n++ + " (FPS = " + (int)fps + ")");
                 imagePanel1.refresh(image.getData());
-                /*Toolkit toolkit = imagePanel1.getToolkit();
-                Image theImage = toolkit.createImage(image.getData());
-                toolkit.prepareImage(theImage,-1,-1,null);     
-                imagePanel1.icon.setImage(theImage);
-                imagePanel1.icon.paintIcon(imagePanel1, imagePanel1.getGraphics(), 5, 5);
-                System.out.println(n++);*/
             }
         }
         javax.swing.SwingUtilities.invokeLater(new ImagePutter(image));

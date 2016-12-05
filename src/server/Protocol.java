@@ -2,7 +2,7 @@ package server;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
+//import java.nio.ByteBuffer;
 
 import common.Image;
 
@@ -13,14 +13,20 @@ public class Protocol {
         out.write(mode);
         final byte[] buffer = new byte[8];
 
-        ByteBuffer.wrap(buffer).putLong(timestamp);
+        for (int i = 1; i <= 8; ++i) {
+            buffer[i - 1] = (byte)(timestamp >> (8 * (8 - i)));
+        }
+        //ByteBuffer.wrap(buffer).putLong(timestamp);
         out.write(buffer, 0, 8);
 
         byte[] imageData = image.getData();
         int dataLength = imageData.length;
-        ByteBuffer.wrap(buffer).putInt(dataLength);
+        for (int i = 1; i <= 4; ++i) {
+            buffer[i - 1] = (byte)(dataLength >> (8 * (4 - i)));
+        }
+        //ByteBuffer.wrap(buffer).putInt(dataLength);
         out.write(buffer, 0, 4);
-        
+
         //System.out.println("Sent " + imageData.length + " image bytes.");
 
         out.write(imageData, 0, dataLength);

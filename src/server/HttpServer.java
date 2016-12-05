@@ -1,9 +1,9 @@
 package server;
 
-import java.io.File;
+/*import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
+import java.io.BufferedReader;*/
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -31,14 +31,14 @@ public class HttpServer implements Runnable {
                     Socket clientSocket = serverSocket.accept();
                     InputStream in = clientSocket.getInputStream();
                     OutputStream out = clientSocket.getOutputStream();
-    
+
                     // Read request.
                     String request, inputLine;
                     request = inputLine = readln(in);
                     while (inputLine != null && !inputLine.equals("")) {
                         inputLine = readln(in);
                     }
-    
+
                     // See that it is a GET request.
                     if (null != request && !request.startsWith("GET ")) {
                         writeln(out, "HTTP/1.0 501 Method not implemented");
@@ -46,12 +46,12 @@ public class HttpServer implements Runnable {
                         clientSocket.close();
                         continue;
                     }
-    
+
                     // Send JPEG image or HTML index (depending on request).
                     // - Since this is extra functionality, we will default to
                     // just showing the image directly if there is no index.html.
                     final String indexPath = "web/index.html";
-                    final boolean indexExists = new File(indexPath).isFile();
+                    final boolean indexExists = false;//new File(indexPath).isFile();
                     writeln(out, "HTTP/1.0 200 OK");
                     if (!indexExists || request.substring(4, 10).equals("/image")) {
                         Image image = monitor.getImage(lastImage);
@@ -69,7 +69,7 @@ public class HttpServer implements Runnable {
                         writeln(out, "");
                         writeln(out, content);
                     }
-    
+
                     out.flush();
                     clientSocket.close();
                 } catch (Exception e) {
@@ -99,26 +99,27 @@ public class HttpServer implements Runnable {
 
         return result;
     }
-    
+
     private void writeln(OutputStream out, String s) throws IOException {
         final byte[] CRLF = { '\r', '\n' };
         out.write(s.getBytes());
         out.write(CRLF);
     }
-    
+
     private static String readTextFile(String fileName) throws IOException {
-        InputStream is = new FileInputStream(fileName);
+        return "";
+        /*InputStream is = new FileInputStream(fileName);
         BufferedReader buf = new BufferedReader(new InputStreamReader(is));
-                
+
         String line = buf.readLine();
         StringBuilder sb = new StringBuilder();
-                
+
         while(line != null){
            sb.append(line).append("\r\n");
            line = buf.readLine();
         }
-                
+
         buf.close();
-        return sb.toString();
+        return sb.toString();*/
     }
 }

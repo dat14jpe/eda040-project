@@ -37,14 +37,14 @@ public class In implements Runnable {
                 int dataLen = readInt(is);
                 byte[] imageData = readBytes(is, dataLen);
                 boolean motion = mode == Monitor.MODE_IDLE ? false : true;
-                
+
                 monitor.putImage(new Image(timestamp, id, motion, imageData));
             } catch (Exception e) {
                 //throw new Error(e);
             }
         }
     }
-    
+
     private byte[] readBytes(InputStream is, int n) throws IOException {
         byte[] data = new byte[n];
         int received = 0;
@@ -53,11 +53,11 @@ public class In implements Runnable {
         } while (received != n);
         return data;
     }
-    
+
     private int readInt(InputStream is) throws IOException {
         return ByteBuffer.wrap(readBytes(is, 4)).getInt();
     }
-    
+
     private long readLong(InputStream is) throws IOException {
         return ByteBuffer.wrap(readBytes(is, 8)).getLong();
     }
