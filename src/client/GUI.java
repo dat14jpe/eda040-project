@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -49,6 +48,8 @@ class ImagePanel extends JPanel {
 
     public void refresh(byte[] data) {
         Image theImage = getToolkit().createImage(data);
+        Dimension size = getSize();
+        theImage = theImage.getScaledInstance((int)size.getWidth(), (int)size.getHeight(), java.awt.Image.SCALE_SMOOTH);
         getToolkit().prepareImage(theImage, -1, -1, null);
         icon.setImage(theImage);
         icon.paintIcon(this, this.getGraphics(), 5, 5);
@@ -106,14 +107,26 @@ public class GUI {
         frame.setVisible(true);
     }
     
+    static int n = 0;
+    
     public void put(common.Image image) { //show mode?
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        class ImagePutter implements Runnable {
+            private common.Image image;
+            
+            public ImagePutter(common.Image image) {
+                this.image = image;
+            }
+            
             public void run() {
-                Image theImage = imagePanel1.getToolkit().createImage(image.getData());
-                imagePanel1.getToolkit().prepareImage(theImage,-1,-1,null);     
+                imagePanel1.refresh(image.getData());
+                /*Toolkit toolkit = imagePanel1.getToolkit();
+                Image theImage = toolkit.createImage(image.getData());
+                toolkit.prepareImage(theImage,-1,-1,null);     
                 imagePanel1.icon.setImage(theImage);
                 imagePanel1.icon.paintIcon(imagePanel1, imagePanel1.getGraphics(), 5, 5);
+                System.out.println(n++);*/
             }
-        });
+        }
+        javax.swing.SwingUtilities.invokeLater(new ImagePutter(image));
     }
 }

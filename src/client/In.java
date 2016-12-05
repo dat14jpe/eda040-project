@@ -1,6 +1,6 @@
 package client;
 
-import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
@@ -18,45 +18,47 @@ public class In implements Runnable {
         this.id = id;
     }
 
-    public int toInt(byte[] arr) {
-        return ByteBuffer.wrap(arr).getInt();
-    }
-
     @Override
     public void run() {
         while (true) {
             try {
                 Socket socket = connection.getSocket();
-                
                 InputStream is = socket.getInputStream();
 
                 int packetType = is.read();
+                if (Monitor.PACKET_S2C != packetType) {
+                    // - what to do?
+                }
 
                 int mode = is.read();
-                //monitor.setMode(mode);
+                monitor.setMode(mode);
 
-                byte[] timestamp = new byte[8];
-                is.read(timestamp);
-
-                byte[] dataLen = new byte[4];
-                is.read(dataLen);
-
-                byte[] imageData = new byte[toInt(dataLen)];
-                is.read(imageData);
+                long timestamp = readLong(is);
+                int dataLen = readInt(is);
+                byte[] imageData = readBytes(is, dataLen);
+                boolean motion = mode == Monitor.MODE_IDLE ? false : true;
                 
-                // - Testing.
-                if (false) {
-                    FileOutputStream fos = new FileOutputStream("testimage.jpg");
-                    fos.write(imageData);
-                    fos.close();
-                    Thread.sleep(2000);
-                }
-                
-                monitor.putImage(new Image(toInt(timestamp), this.id, imageData, mode == monitor.MODE_IDLE ? false : true));
+                monitor.putImage(new Image(timestamp, id, motion, imageData));
             } catch (Exception e) {
                 //throw new Error(e);
             }
         }
     }
-
+    
+    private byte[] readBytes(InputStream is, int n) throws IOException {
+        byte[] data = new byte[n];
+        int received = 0;
+        do {
+            received += is.read(data, received, n - received);
+        } while (received != n);
+        return data;
+    }
+    
+    private int readInt(InputStream is) throws IOException {
+        return ByteBuffer.wrap(readBytes(is, 4)).getInt();
+    }
+    
+    private long readLong(InputStream is) throws IOException {
+        return ByteBuffer.wrap(readBytes(is, 8)).getLong();
+    }
 }

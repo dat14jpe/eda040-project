@@ -2,28 +2,27 @@ package server;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+
 import common.Image;
 
 public class Protocol {
     public static void writePacket(OutputStream out, int mode, long timestamp, Image image) throws IOException {
-        int packetType = 1; // server to client
+        int packetType = Monitor.PACKET_S2C;
         out.write(packetType);
         out.write(mode);
-        byte[] buffer = new byte[8];
+        final byte[] buffer = new byte[8];
 
-        // Write timestamp.
-        for (int i = 1; i <= 8; ++i) {
-            buffer[i - 1] = (byte) (timestamp >> (8 - i) * 8);
-        }
+        ByteBuffer.wrap(buffer).putLong(timestamp);
         out.write(buffer, 0, 8);
 
-        // Write data (image) length.
         byte[] imageData = image.getData();
-        for (int i = 1; i <= 4; ++i) {
-            buffer[i - 1] = (byte) (imageData.length >> (4 - i) * 8);
-        }
+        int dataLength = imageData.length;
+        ByteBuffer.wrap(buffer).putInt(dataLength);
         out.write(buffer, 0, 4);
+        
+        //System.out.println("Sent " + imageData.length + " image bytes.");
 
-        out.write(imageData);
+        out.write(imageData, 0, dataLength);
     }
 }

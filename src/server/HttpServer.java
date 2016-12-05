@@ -1,8 +1,9 @@
 package server;
 
-/*import java.io.File;
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStreamReader;*/
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,17 +13,18 @@ import common.Image;
 
 public class HttpServer implements Runnable {
     private Monitor monitor;
+    private int port;
 
-    public HttpServer(Monitor monitor) {
+    public HttpServer(Monitor monitor, int port) {
         this.monitor = monitor;
+        this.port = port;
     }
 
     public void run() {
         try {
-            final int portNumber = 7654;
-            ServerSocket serverSocket = new ServerSocket(portNumber);
+            ServerSocket serverSocket = new ServerSocket(port);
             //serverSocket.setReuseAddress(true);
-            System.out.println("Camera HTTP server on port " + portNumber);
+            System.out.println("Camera HTTP server on port " + port);
             Image lastImage = null;
             while (true) {
                 try {
@@ -49,7 +51,7 @@ public class HttpServer implements Runnable {
                     // - Since this is extra functionality, we will default to
                     // just showing the image directly if there is no index.html.
                     final String indexPath = "web/index.html";
-                    final boolean indexExists = false;//new File(indexPath).isFile();
+                    final boolean indexExists = new File(indexPath).isFile();
                     writeln(out, "HTTP/1.0 200 OK");
                     if (!indexExists || request.substring(4, 10).equals("/image")) {
                         Image image = monitor.getImage(lastImage);
@@ -61,7 +63,7 @@ public class HttpServer implements Runnable {
                         writeln(out, "");
                         out.write(imageData);
                     } else {
-                        String content = "";//readTextFile("web/index.html");
+                        String content = readTextFile("web/index.html");
                         writeln(out, "Content-Length: " + content.length());
                         writeln(out, "Content-Type: text/html; charset=utf-8");
                         writeln(out, "");
@@ -104,7 +106,7 @@ public class HttpServer implements Runnable {
         out.write(CRLF);
     }
     
-    /*private static String readTextFile(String fileName) throws IOException {
+    private static String readTextFile(String fileName) throws IOException {
         InputStream is = new FileInputStream(fileName);
         BufferedReader buf = new BufferedReader(new InputStreamReader(is));
                 
@@ -118,5 +120,5 @@ public class HttpServer implements Runnable {
                 
         buf.close();
         return sb.toString();
-    }*/
+    }
 }

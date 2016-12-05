@@ -26,27 +26,29 @@ public class Renderer implements Runnable {
     public void run() {
         final long switchTime = 200L;
         
+        long timeToNext = 0; // time until next image should ideally be rendered
         while (true) {
             Image image = monitor.getImage();
             List<Image> images = this.images.get(image.getCameraId());
             long t = System.currentTimeMillis();
             if (monitor.getMode() == Monitor.MODE_IDLE || !synchronous) {
-                if (t - lastAsyncTime < switchTime) 
+                if (t - lastAsyncTime < switchTime) {
                     debounceSynchronicity(true);
+                }
                 gui.put(image);
                 lastAsyncTime = t;
-            }
-            else {
+            } else { // synchronous mode
                 if (images.isEmpty()) {
-                    gui.put(image);
                     images.add(image);
-                }
-                else {
+                    sendImage(image);
+                } else {
                     images.add(image);
                     Image lastShown = images.get(0);
                     Image nextToShow = images.get(1);
-                    long clientDelay = t - lastShown.getClientTime(),
-                         serverDelay = nextToShow.getTimestamp() - lastShown.getTimestamp();
+                    long clientDelay = t - lastShown.getClientTime();
+                    long serverDelay = nextToShow.getTimestamp() - lastShown.getTimestamp();
+                    
+                    //System.out.println("Client delay: " + clientDelay + ", server delay: " + serverDelay);
                     
                     // Switch to asynchronous?
                     if (clientDelay > switchTime) {
@@ -56,11 +58,10 @@ public class Renderer implements Runnable {
                             i.clear();
                         }
                     } else {
-                    
+                        timeToNext = serverDelay - clientDelay;
                         if (clientDelay >= serverDelay) {
                             images.remove(0);
-                            nextToShow.setClientTime(t);
-                            gui.put(nextToShow);
+                            sendImage(nextToShow);
                         }
                     }
                 }
@@ -72,6 +73,7 @@ public class Renderer implements Runnable {
     private void debounceSynchronicity(boolean synchronous) {
         long t = System.currentTimeMillis();
         final long debounceTime = 3000L;
+        if (false)
         if (t - lastSyncSwitch > debounceTime) {
             System.out.println("Synchronicity switch: " + synchronous);
             this.synchronous = synchronous;
@@ -80,7 +82,8 @@ public class Renderer implements Runnable {
     }
     
     private boolean sendImage(Image image) {
-        
+        image.setClientTime(System.currentTimeMillis());
+        gui.put(image);
         return true;
     }
 

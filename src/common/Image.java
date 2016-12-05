@@ -6,8 +6,8 @@ public class Image {
 	private byte[] data;
 	private boolean motion;
 	
-	public Image(long t, int id, byte[] d, boolean m) {
-		timestamp = t;
+	public Image(long time, int id, boolean m, byte[] d) {
+		timestamp = time;
 		cameraId = id;
 		data = d;
 		motion = m;

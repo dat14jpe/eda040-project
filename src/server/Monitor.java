@@ -24,6 +24,12 @@ public class Monitor {
 
     public synchronized void putImage(Image image) {
         this.image = image;
+        
+        // Immediately enter movie mode on motion detection.
+        if (image.getMotion()) {
+            mode = MODE_MOVIE;
+        }
+        
         notifyAll();
     }
 

@@ -1,30 +1,37 @@
 package server;
 
+import java.io.IOException;
 import java.net.*;
 //import java.net.ServerSocket;
 //import java.net.Socket;
 
 public class Server {
     public static void main(String[] args) {
+        final int httpPort = 7654, port = 8765;
+        
         Monitor monitor = new Monitor();
         new Thread(new Read(monitor)).start();
-        new Thread(new HttpServer(monitor)).start();
+        new Thread(new HttpServer(monitor, httpPort)).start();
         new Thread(new In(monitor)).start();
         new Thread(new Out(monitor)).start();
 
+        ServerSocket serverSocket = null;
         try {
-            final int portNumber = 8765;
-            ServerSocket serverSocket = new ServerSocket(portNumber);
-            System.out.println("Camera server on port " + portNumber);
+            serverSocket = new ServerSocket(port);
+            System.out.println("Camera server on port " + port);
             while (true) {
-                Socket clientSocket = serverSocket.accept();
-                monitor.setSocket(clientSocket);
+                monitor.setSocket(serverSocket.accept());
                 // - to do: wait (or does next iteration's accept()-call take
                 // care of that?)
-                // clientSocket.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) { e.printStackTrace(); }
+            }
         }
     }
 }

@@ -1,7 +1,5 @@
 package client;
 
-import server.Read;
-
 public class Client {
     public static void main(String[] args) {
         Monitor monitor = new Monitor();
