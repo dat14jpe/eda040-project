@@ -21,8 +21,9 @@ public class HttpServer implements Runnable {
     }
 
     public void run() {
+        ServerSocket serverSocket = null;
         try {
-            ServerSocket serverSocket = new ServerSocket(port);
+            serverSocket = new ServerSocket(port);
             //serverSocket.setReuseAddress(true);
             System.out.println("Camera HTTP server on port " + port);
             Image lastImage = null;
@@ -78,6 +79,14 @@ public class HttpServer implements Runnable {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            if (null != serverSocket) {
+                try {
+                    serverSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

@@ -1,20 +1,19 @@
 package client;
 
-import common.Image;
+import common.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class Monitor {
-    public final static int PACKET_S2C = 1, PACKET_C2S = 2;
-    public final static int MODE_IDLE = 1, MODE_MOVIE = 2, MODE_AUTO = 3;
-    public final static long MOVIE_TIME = 3000;
-
     private int minId;
     private int mode;
     private boolean automaticMode; // true if mode can be changed by setMode
     private long movieTime;
+    
+    private int lastMotionId;
+    boolean motion;
 
     private Queue<Image> images;
     private ArrayList<Connection> connections;
@@ -23,8 +22,12 @@ public class Monitor {
     public Monitor() {
         connections = new ArrayList<Connection>();
         this.minId = 0;
-        this.mode = MODE_IDLE;
+        this.mode = Constants.MODE_IDLE;
         images = new LinkedList<Image>();
+        lastMotionId = 0;
+        motion = false;
+        
+        automaticMode = true;
     }
 
     public synchronized int getMode() {
@@ -32,14 +35,14 @@ public class Monitor {
     }
 
     public synchronized int getForcedMode() {
-        return automaticMode ? MODE_AUTO : mode;
+        return automaticMode ? Constants.MODE_AUTO : mode;
     }
 
     public synchronized void forceMode(int mode) {
-        if (MODE_AUTO != mode) {
+        if (Constants.MODE_AUTO != mode) {
             this.mode = mode;
         }
-        automaticMode = MODE_AUTO == mode;
+        automaticMode = Constants.MODE_AUTO == mode;
         movieTime = 0;
         notifyAll();
     }
@@ -47,10 +50,10 @@ public class Monitor {
     public synchronized void setMode(int mode) {
         if (automaticMode) {
             long t = System.currentTimeMillis();
-            if (MODE_MOVIE == mode) {
-                this.mode = MODE_MOVIE;
+            if (Constants.MODE_MOVIE == mode) {
+                this.mode = Constants.MODE_MOVIE;
                 movieTime = t;
-            } else if (t - movieTime > MOVIE_TIME) {
+            } else if (t - movieTime > Constants.MOVIE_TIME) {
                 this.mode = mode;
             }
         }
@@ -59,17 +62,33 @@ public class Monitor {
 
     public synchronized int waitForModeChange() {
         int latestMode = mode;
-        while (latestMode == mode) {
+        boolean wasAutomatic = automaticMode, wasMotion = motion;
+        while (latestMode == mode && wasAutomatic == automaticMode) {
+            if (automaticMode && wasMotion != motion) {
+                break;
+            }
             try {
                 wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-        return mode;
+        //System.out.println(automaticMode + " " + mode + " (was " + wasAutomatic + " " + latestMode + ")");
+        if (automaticMode) {
+            //return mode == Constants.MODE_IDLE ? Constants.MODE_AUTO : Constants.MODE_AUTO_MOVIE;
+            return motion ? Constants.MODE_MOVIE : Constants.MODE_AUTO;
+        } else {
+            return mode;
+        }
     }
 
     public synchronized void putImage(Image image) {
+        if (image.getMotion()) {
+            lastMotionId = image.getCameraId();
+            motion = true;
+        } else if (image.getCameraId() == lastMotionId) {
+            motion = false;
+        }
         images.add(image);
         notifyAll();
     }
@@ -92,13 +111,17 @@ public class Monitor {
 
     // Returns null on timeout.
     public synchronized Image getImage(long timeout) {
+        if (!images.isEmpty()) return images.poll();
         try {
-            while (images.isEmpty()) wait(timeout);
+            if (0 == timeout) {
+                while (images.isEmpty()) wait();
+            } else {
+                wait(timeout);
+                if (images.isEmpty()) return null;
+                return images.poll();
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
-        if (images.isEmpty()) {
-            return null;
         }
         return images.poll();
     }

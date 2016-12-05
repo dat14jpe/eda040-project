@@ -1,6 +1,6 @@
 package server;
 
-import common.Image;
+import common.*;
 import java.net.Socket;
 
 public class Monitor {
@@ -9,17 +9,14 @@ public class Monitor {
     private int mode;
     private boolean automaticMode;
 
-    public final static int PACKET_S2C = 1, PACKET_C2S = 2;
-    public final static int MODE_IDLE = 1, MODE_MOVIE = 2, MODE_AUTO = 3;
-
     public Monitor() {
         reset();
     }
 
     // Reset mode between client connections.
     public synchronized void reset() {
-        automaticMode = false;//true;
-        mode = MODE_IDLE;
+        automaticMode = true;
+        mode = Constants.MODE_IDLE;
         notifyAll();
     }
 
@@ -28,13 +25,15 @@ public class Monitor {
     }
 
     public synchronized void forceMode(int mode) {
-        if (MODE_AUTO == mode) automaticMode = true;
-        if (MODE_AUTO != mode) this.mode = mode;
+        automaticMode = Constants.MODE_AUTO == mode;
+        if (!automaticMode) this.mode = mode;
         notifyAll();
     }
 
     public synchronized void setMode(int mode) {
-        if (automaticMode) this.mode = mode;
+        if (automaticMode) {
+            this.mode = mode;
+        }
         notifyAll();
     }
 
@@ -43,7 +42,10 @@ public class Monitor {
 
         // Immediately enter movie mode on motion detection.
         if (image.getMotion()) {
-            mode = MODE_MOVIE;
+            setMode(Constants.MODE_MOVIE);
+        } else {
+            // Need delay here?
+            setMode(Constants.MODE_IDLE);
         }
 
         notifyAll();
@@ -65,7 +67,7 @@ public class Monitor {
 
     public synchronized Socket getClientSocket() {
         try {
-            while (null == clientSocket) wait();
+            while (null == clientSocket || clientSocket.isClosed()) wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

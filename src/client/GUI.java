@@ -1,5 +1,7 @@
 package client;
 
+import common.Constants;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -34,6 +36,7 @@ class ButtonHandler implements ActionListener {
 }
 
 class ImagePanel extends JPanel {
+    private static final long serialVersionUID = 1L;
     ImageIcon icon;
 
     public ImagePanel() {
@@ -41,7 +44,7 @@ class ImagePanel extends JPanel {
         icon = new ImageIcon();
         JLabel label = new JLabel(icon);
         add(label, BorderLayout.CENTER);
-        this.setSize(200, 200);
+        this.setSize(400, 400);
     }
 
     public void refresh(byte[] data) {
@@ -72,7 +75,7 @@ public class GUI {
     public void show() {
         JFrame frame = new JFrame("Camera Client");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(800, 800));
+        frame.setPreferredSize(new Dimension(1000, 1000));
         frame.setLayout(new GridLayout(0, 2));
         frame.setResizable(false);
 
@@ -91,17 +94,17 @@ public class GUI {
         JButton idleButton = new JButton("Idle Mode");
         JButton movieButton = new JButton("Movie Mode");
         JButton autoButton = new JButton("Auto Mode");
-        idleButton.addActionListener(new ButtonHandler(this, Monitor.MODE_IDLE, monitor));
+        idleButton.addActionListener(new ButtonHandler(this, Constants.MODE_IDLE, monitor));
         idleButton.setFont(new Font("Arial", Font.BOLD, 40));
-        movieButton.addActionListener(new ButtonHandler(this, Monitor.MODE_MOVIE, monitor));
+        movieButton.addActionListener(new ButtonHandler(this, Constants.MODE_MOVIE, monitor));
         movieButton.setFont(new Font("Arial", Font.BOLD, 40));
-        autoButton.addActionListener(new ButtonHandler(this, Monitor.MODE_AUTO, monitor));
+        autoButton.addActionListener(new ButtonHandler(this, Constants.MODE_AUTO, monitor));
         autoButton.setFont(new Font("Arial", Font.BOLD, 40));
         frame.add(idleButton);
         frame.add(movieButton);
         frame.add(autoButton);
 
-        statusLabel = new JLabel("Hello?", SwingConstants.CENTER);
+        statusLabel = new JLabel("", SwingConstants.CENTER);
         frame.add(statusLabel);
 
         frame.pack();
@@ -133,10 +136,10 @@ public class GUI {
                 s += "Mode: ";
                 int forcedMode = monitor.getForcedMode();
                 int mode = monitor.getMode();
-                if (forcedMode == Monitor.MODE_AUTO) {
-                    s += "auto (" + (mode == Monitor.MODE_IDLE ? "idle" : "movie") + ")";
+                if (forcedMode == Constants.MODE_AUTO) {
+                    s += "auto (" + (mode == Constants.MODE_IDLE ? "idle" : "movie") + ")";
                 } else {
-                    s += mode == Monitor.MODE_IDLE ? "idle" : "movie";
+                    s += mode == Constants.MODE_IDLE ? "idle" : "movie";
                 }
                 s += "<br>";
 

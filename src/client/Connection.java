@@ -1,35 +1,31 @@
 package client;
 
-import java.io.IOException;
 import java.net.Socket;
-import java.net.UnknownHostException;
-
-import org.omg.CORBA_2_3.portable.OutputStream;
 
 public class Connection {
     private boolean connected;
     private String address;
     private int port;
-    private Monitor monitor;
+    //private Monitor monitor;
     private Socket socket;
 
     private long timer;
-
-    private Thread in;
-    private Thread out;
 
     public Connection(String address, int port, Monitor monitor) {
         this.connected = false;
         this.address = address;
         this.port = port;
-        this.monitor = monitor;
+        //this.monitor = monitor;
         this.timer = System.currentTimeMillis();
 
         final long delay = 0L;//3000L;
-        while (!connected) {
+        final int maxTries = 1;
+        int tries = 0;
+        while (!connected && tries < maxTries) {
             long delta = System.currentTimeMillis() - timer;
-            if (delta > delay) {
+            if (delta >= delay) {
                 connect();
+                ++tries;
             }
         }
     }
@@ -39,12 +35,14 @@ public class Connection {
         try {
             this.socket = new Socket(address, port);
             this.connected = true;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
     }
 
     public Socket getSocket() {
         return socket;
+    }
+    
+    public boolean isConnected() {
+        return connected;
     }
 }

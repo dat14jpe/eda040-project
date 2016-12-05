@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
-import common.Image;
+import common.*;
 
 public class In implements Runnable {
     private Monitor monitor;
@@ -26,7 +26,7 @@ public class In implements Runnable {
                 InputStream is = socket.getInputStream();
 
                 int packetType = is.read();
-                if (Monitor.PACKET_S2C != packetType) {
+                if (Constants.PACKET_S2C != packetType) {
                     // - what to do?
                 }
 
@@ -36,7 +36,7 @@ public class In implements Runnable {
                 long timestamp = readLong(is);
                 int dataLen = readInt(is);
                 byte[] imageData = readBytes(is, dataLen);
-                boolean motion = mode == Monitor.MODE_IDLE ? false : true;
+                boolean motion = mode == Constants.MODE_IDLE ? false : true;
 
                 monitor.putImage(new Image(timestamp, id, motion, imageData));
             } catch (Exception e) {

@@ -3,7 +3,7 @@ package server;
 import java.io.IOException;
 import java.net.Socket;
 
-import common.Image;
+import common.*;
 
 public class Out implements Runnable {
     private Monitor monitor;
@@ -24,16 +24,19 @@ public class Out implements Runnable {
 
                 // Skip images if in idle mode.
                 final long TIME_LIMIT = 5000L;
-                if (Monitor.MODE_IDLE == monitor.getMode() && timestamp - timeSent < TIME_LIMIT) {
+                if (Constants.MODE_IDLE == monitor.getMode() && timestamp - timeSent < TIME_LIMIT) {
                     continue;
                 }
 
-                int mode = image.getMotion() ? Monitor.MODE_MOVIE : Monitor.MODE_IDLE;
+                int mode = image.getMotion() ? Constants.MODE_MOVIE : Constants.MODE_IDLE;
                 timeSent = timestamp;
-                //System.out.println("SERVER sent image");
                 Protocol.writePacket(socket.getOutputStream(), mode, timestamp, image);
-            } catch (Exception e) {
-                //e.printStackTrace();
+            } catch (IOException e) {
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
     }

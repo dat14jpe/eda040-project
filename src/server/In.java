@@ -1,7 +1,9 @@
 package server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
+import common.Constants;
 
 public class In implements Runnable {
     private Monitor monitor;
@@ -16,15 +18,18 @@ public class In implements Runnable {
             try {
                 InputStream in = socket.getInputStream();
                 int packetType = in.read();
-                if (Monitor.PACKET_C2S != packetType) {
+                if (Constants.PACKET_C2S != packetType) {
                     // - log error?
                     continue;
                 }
                 int mode = in.read();
-                System.out.println("server in mode: " + mode);
                 monitor.forceMode(mode);
-            } catch (Exception e) {
-                //e.printStackTrace();
+            } catch (IOException e) {
+                try {
+                    socket.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         }
     }

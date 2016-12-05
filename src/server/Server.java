@@ -7,7 +7,11 @@ import java.net.*;
 
 public class Server {
     public static void main(String[] args) {
-        final int httpPort = 7654, port = 8765;
+        // Optional parameters: "main" port, and HTTP port.
+        // Defaults are given below.
+        int port = 8765, httpPort = 7654;
+        if (args.length >= 1) port = Integer.parseInt(args[0]);
+        if (args.length >= 2) httpPort = Integer.parseInt(args[1]);
 
         Monitor monitor = new Monitor();
         new Thread(new Read(monitor)).start();
@@ -22,32 +26,20 @@ public class Server {
             while (true) {
                 monitor.reset();
                 try {
-                    System.out.println("one");
                     monitor.setSocket(serverSocket.accept());
-                    System.out.println("one point five");
-                    // - to do: wait (or does next iteration's accept()-call take
-                    // care of that?)
-                } catch (Exception e) {
-                    System.out.println("two");
-                }
+                } catch (Exception e) {}
             }
         } catch (Exception e) {
-            System.out.println("three");
             e.printStackTrace();
         } finally {
-            System.out.println("four");
             if (serverSocket != null) {
-                System.out.println("five");
                 try {
-                    System.out.println("six");
                     serverSocket.close();
                 } catch (IOException e) {
-                    System.out.println("seven");
                     e.printStackTrace();
                 }
             }
         }
-
         System.out.println("Server exiting");
     }
 }
