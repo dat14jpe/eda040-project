@@ -34,7 +34,7 @@ public class Renderer implements Runnable {
                 if (t - lastAsyncTime < switchTime) {
                     debounceSynchronicity(true);
                 }
-                gui.put(image);
+                sendImage(image);
                 lastAsyncTime = t;
             } else { // synchronous mode
                 if (null != image) {
@@ -50,14 +50,17 @@ public class Renderer implements Runnable {
 
                 // Show new images.
                 timeToNext = Long.MAX_VALUE;
+                int numImages = 0;
                 for (List<Image> images : this.images) {
+                    numImages += images.size();
                     long camTimeToNext = synchronizedMode(images);
                     if (0 != camTimeToNext) {
                         timeToNext = Math.min(camTimeToNext, timeToNext);
                     }
                 }
+                //System.out.println("Num images: " + numImages);
                 if (Long.MAX_VALUE == timeToNext) timeToNext = 0;
-                System.out.println("timeToNext: " + timeToNext);
+                //System.out.println("timeToNext: " + timeToNext);
             }
         }
     }
@@ -72,19 +75,33 @@ public class Renderer implements Runnable {
         long clientDelay = t - lastShown.getClientTime();
         long serverDelay = nextToShow.getTimestamp() - lastShown.getTimestamp();
 
-        //System.out.println("Client delay: " + clientDelay + ", server delay: " + serverDelay);
+        int numImages = 0;
+        for (List<Image> i : this.images) {
+            numImages += i.size();
+        }
+        System.out.println("Images: " + numImages + ", client delay: " + clientDelay + ", server delay: " + serverDelay);
 
         // Switch to asynchronous?
         if (clientDelay > switchTime) {
             debounceSynchronicity(false);
         } else {
-            timeToNext = serverDelay - clientDelay;
+            do {
+                if (images.size() < 2) return timeToNext < 0 ? 0 : timeToNext;
+                lastShown = images.get(0);
+                nextToShow = images.get(1);
+                clientDelay = t - lastShown.getClientTime();
+                serverDelay = nextToShow.getTimestamp() - lastShown.getTimestamp();
+
+                timeToNext = serverDelay - clientDelay;
+                final long tolerance = 10;
+                if (timeToNext <= tolerance) {
+                    images.remove(0);
+                    while (images.size() > 2) images.remove(0);
+                    sendImage(nextToShow);
+                }
+            } while (timeToNext <= 0);
             if (timeToNext < 0) {
                 timeToNext = 0;
-            }
-            if (clientDelay >= serverDelay) {
-                images.remove(0);
-                sendImage(nextToShow);
             }
         }
 
@@ -110,7 +127,7 @@ public class Renderer implements Runnable {
 
     private boolean sendImage(Image image) {
         image.setClientTime(System.currentTimeMillis());
-        gui.put(image);
+        gui.put(image, synchronous);
         return true;
     }
 }

@@ -22,21 +22,32 @@ public class Server {
             while (true) {
                 monitor.reset();
                 try {
+                    System.out.println("one");
                     monitor.setSocket(serverSocket.accept());
+                    System.out.println("one point five");
                     // - to do: wait (or does next iteration's accept()-call take
                     // care of that?)
                 } catch (Exception e) {
-                    continue;
+                    System.out.println("two");
                 }
             }
         } catch (Exception e) {
+            System.out.println("three");
             e.printStackTrace();
         } finally {
+            System.out.println("four");
             if (serverSocket != null) {
+                System.out.println("five");
                 try {
+                    System.out.println("six");
                     serverSocket.close();
-                } catch (IOException e) { e.printStackTrace(); }
+                } catch (IOException e) {
+                    System.out.println("seven");
+                    e.printStackTrace();
+                }
             }
         }
+
+        System.out.println("Server exiting");
     }
 }

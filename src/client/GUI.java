@@ -116,22 +116,50 @@ public class GUI {
     int n = 0;
     long lastT = System.currentTimeMillis();
 
-    public void put(common.Image image) { //show mode?
+    public void put(common.Image image, boolean synchronous) { //show mode?
         class ImagePutter implements Runnable {
             private common.Image image;
+            private boolean synchronous;
 
-            public ImagePutter(common.Image image) {
+            public ImagePutter(common.Image image, boolean synchronous) {
                 this.image = image;
+                this.synchronous = synchronous;
             }
 
             public void run() {
+                String s = "<html>";
+
+                // Display mode.
+                s += "Mode: ";
+                int forcedMode = monitor.getForcedMode();
+                int mode = monitor.getMode();
+                if (forcedMode == Monitor.MODE_AUTO) {
+                    s += "auto (" + (mode == Monitor.MODE_IDLE ? "idle" : "movie") + ")";
+                } else {
+                    s += mode == Monitor.MODE_IDLE ? "idle" : "movie";
+                }
+                s += "<br>";
+
+                // Display synchronized/asynchronized.
+                s += (synchronous ? "synchronous" : "asynchronous") + "<br>";
+
+
                 long t = System.currentTimeMillis();
                 double fps = 1000.0 / (t - lastT);
                 lastT = t;
-                statusLabel.setText("Frame " + n++ + " (FPS = " + (int)fps + ")");
-                imagePanel1.refresh(image.getData());
+                s += "Frame " + n++ + " (FPS = " + (int)fps + ")<br>";
+                int id = image.getCameraId();
+                ImagePanel panel = null;
+                switch (id) {
+                    case 0: panel = imagePanel1; break;
+                    case 1: panel = imagePanel2; break;
+                }
+
+                s += "</html>";
+                panel.refresh(image.getData());
+                statusLabel.setText(s);
             }
         }
-        javax.swing.SwingUtilities.invokeLater(new ImagePutter(image));
+        javax.swing.SwingUtilities.invokeLater(new ImagePutter(image, synchronous));
     }
 }

@@ -21,7 +21,7 @@ public class In implements Runnable {
                     continue;
                 }
                 int mode = in.read();
-                //System.out.println("server in mode: " + mode);
+                System.out.println("server in mode: " + mode);
                 monitor.forceMode(mode);
             } catch (Exception e) {
                 //e.printStackTrace();

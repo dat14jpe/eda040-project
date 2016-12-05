@@ -19,7 +19,7 @@ public class Monitor {
 
     public Monitor() {
         connections = new ArrayList<Connection>();
-        this.minId = 1;
+        this.minId = 0;
         this.mode = MODE_IDLE;
         images = new LinkedList<Image>();
     }
@@ -28,9 +28,14 @@ public class Monitor {
         return mode;
     }
 
+    public synchronized int getForcedMode() {
+        return automaticMode ? MODE_AUTO : mode;
+    }
+
     public synchronized void forceMode(int mode) {
         if (MODE_AUTO != mode) this.mode = mode;
         automaticMode = MODE_AUTO == mode;
+        notifyAll();
     }
 
     public synchronized void setMode(int mode) {

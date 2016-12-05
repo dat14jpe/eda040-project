@@ -32,7 +32,7 @@ public class Out implements Runnable {
                 timeSent = timestamp;
                 //System.out.println("SERVER sent image");
                 Protocol.writePacket(socket.getOutputStream(), mode, timestamp, image);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 //e.printStackTrace();
             }
         }

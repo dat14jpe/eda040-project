@@ -19,7 +19,7 @@ public class Out implements Runnable {
             Socket socket = connection.getSocket();
             try {
                 int mode = monitor.waitForModeChange();
-                System.out.println("Mode change");          
+                System.out.println("Mode change");
                 OutputStream os = socket.getOutputStream();
                 os.write(Monitor.PACKET_C2S);
                 os.write(mode);

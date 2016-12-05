@@ -13,13 +13,14 @@ public class Monitor {
     public final static int MODE_IDLE = 1, MODE_MOVIE = 2, MODE_AUTO = 3;
 
     public Monitor() {
-        mode = MODE_IDLE;
+        reset();
     }
 
     // Reset mode between client connections.
     public synchronized void reset() {
         automaticMode = true;
         mode = MODE_IDLE;
+        notifyAll();
     }
 
     public synchronized int getMode() {
@@ -29,10 +30,12 @@ public class Monitor {
     public synchronized void forceMode(int mode) {
         if (MODE_AUTO == mode) automaticMode = true;
         if (MODE_AUTO != mode) this.mode = mode;
+        notifyAll();
     }
 
     public synchronized void setMode(int mode) {
         if (automaticMode) this.mode = mode;
+        notifyAll();
     }
 
     public synchronized void putImage(Image image) {
@@ -48,8 +51,7 @@ public class Monitor {
 
     public synchronized Image getImage(Image old) {
         try {
-            while (old == image)
-                wait();
+            while (old == image) wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -63,8 +65,7 @@ public class Monitor {
 
     public synchronized Socket getClientSocket() {
         try {
-            while (null == clientSocket)
-                wait();
+            while (null == clientSocket) wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
