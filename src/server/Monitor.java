@@ -18,7 +18,7 @@ public class Monitor {
 
     // Reset mode between client connections.
     public synchronized void reset() {
-        automaticMode = true;
+        automaticMode = false;//true;
         mode = MODE_IDLE;
         notifyAll();
     }

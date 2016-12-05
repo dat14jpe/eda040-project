@@ -79,7 +79,7 @@ public class Renderer implements Runnable {
         for (List<Image> i : this.images) {
             numImages += i.size();
         }
-        System.out.println("Images: " + numImages + ", client delay: " + clientDelay + ", server delay: " + serverDelay);
+        //System.out.println("Images: " + numImages + ", client delay: " + clientDelay + ", server delay: " + serverDelay);
 
         // Switch to asynchronous?
         if (clientDelay > switchTime) {

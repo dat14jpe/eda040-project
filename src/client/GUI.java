@@ -28,7 +28,7 @@ class ButtonHandler implements ActionListener {
     }
 
     public void actionPerformed(ActionEvent evt) {
-        System.out.println(evt.getActionCommand()); // string
+        //System.out.println(evt.getActionCommand()); // string
         monitor.forceMode(mode);
     }
 }
@@ -90,7 +90,7 @@ public class GUI {
         // Buttons
         JButton idleButton = new JButton("Idle Mode");
         JButton movieButton = new JButton("Movie Mode");
-        JButton autoButton = new JButton("Automatic Mode");
+        JButton autoButton = new JButton("Auto Mode");
         idleButton.addActionListener(new ButtonHandler(this, Monitor.MODE_IDLE, monitor));
         idleButton.setFont(new Font("Arial", Font.BOLD, 40));
         movieButton.addActionListener(new ButtonHandler(this, Monitor.MODE_MOVIE, monitor));
@@ -143,11 +143,12 @@ public class GUI {
                 // Display synchronized/asynchronized.
                 s += (synchronous ? "synchronous" : "asynchronous") + "<br>";
 
-
-                long t = System.currentTimeMillis();
+                // Display FPS (not updated).
+                /*long t = System.currentTimeMillis();
                 double fps = 1000.0 / (t - lastT);
                 lastT = t;
-                s += "Frame " + n++ + " (FPS = " + (int)fps + ")<br>";
+                s += "Frame " + n++ + " (FPS = " + (int)fps + ")<br>";*/
+
                 int id = image.getCameraId();
                 ImagePanel panel = null;
                 switch (id) {

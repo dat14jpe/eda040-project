@@ -9,9 +9,12 @@ import java.util.Queue;
 public class Monitor {
     public final static int PACKET_S2C = 1, PACKET_C2S = 2;
     public final static int MODE_IDLE = 1, MODE_MOVIE = 2, MODE_AUTO = 3;
+    public final static long MOVIE_TIME = 3000;
+
     private int minId;
     private int mode;
     private boolean automaticMode; // true if mode can be changed by setMode
+    private long movieTime;
 
     private Queue<Image> images;
     private ArrayList<Connection> connections;
@@ -33,13 +36,24 @@ public class Monitor {
     }
 
     public synchronized void forceMode(int mode) {
-        if (MODE_AUTO != mode) this.mode = mode;
+        if (MODE_AUTO != mode) {
+            this.mode = mode;
+        }
         automaticMode = MODE_AUTO == mode;
+        movieTime = 0;
         notifyAll();
     }
 
     public synchronized void setMode(int mode) {
-        if (automaticMode) this.mode = mode;
+        if (automaticMode) {
+            long t = System.currentTimeMillis();
+            if (MODE_MOVIE == mode) {
+                this.mode = MODE_MOVIE;
+                movieTime = t;
+            } else if (t - movieTime > MOVIE_TIME) {
+                this.mode = mode;
+            }
+        }
         notifyAll();
     }
 
