@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Surveillance System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Lora|Roboto:400,700" rel="stylesheet">
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+      line-height: 1;
+      color: rgba(0, 0, 0, 0.8);
+      font-size: 13px;
+      font-family: 'Roboto', sans-serif;
+      box-sizing: border-box;
+    }
+    html, body {
+      background: #fff;
+    }
+    #content {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      opacity: 0;
+      margin-left: -240px;
+      padding: 80px 80px 0 80px;
+      width: 480px;
+      background: #fff;
+      transition: all 2000ms cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    #content.visible {
+      opacity: 1;
+    }
+    #top {
+      padding-bottom: 40px;
+    }
+    #title {
+      font-size: 18px;
+      font-family: 'Lora', serif;
+    }
+    #intro {
+      padding-top: 20px;
+      line-height: 1.5;
+    }
+    .content-hd {
+      padding-bottom: 10px;
+      color: #ccc;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.065em;
+      text-transform: uppercase;
+    }
+    .content-section {
+      padding-bottom: 40px;
+    }
+    .content-section p {
+      line-height: 1.5;
+    }
+    a, a:visited {
+      color: #000;
+      text-decoration: none;
+      box-shadow: 0 1px 0 #000;
+    }
+    a:hover {
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="content">
+    <div id="top">
+      <div id="title">Video Surveillance System</div>
+      <div id="intro">
+        This webpage contains relevant information about a video surveillance system.
+        In general, the project was very straight forward. The biggest hurdle was figuring
+        out the design of the whole system before actually building it.
+      </div>
+    </div>
+    <div id="middle">
+      <div class="content-section">
+        <div class="content-hd">Group</div>
+        <p>
+          Dennis Jin (dat14dji)<br />
+          Jens Johansson (dat15jj1)<br />
+          Johan Pettersson (dat14jpe)<br />
+          Patrik Persson (dat14pp1)
+        </p>
+      </div>
+      <div class="content-section">
+        <div class="content-hd">Links</div>
+        <p>
+          <a href="/manual.pdf">Reference manual</a><br />
+          <a href="/presentation.pdf">Presentation</a><br />
+          <a href="https://github.com/dat14jpe/eda040-project/releases/download/1.0/CaSS-binaries.zip">Executables</a><br />
+          <a href="https://github.com/dat14jpe/eda040-project">Source code on Github</a>
+        </p>
+      </div>
+    </div>
+  </div>
+  <script type="text/javascript">
+    window.onload = function() {
+      setTimeout(function() {
+        document.querySelector('#content').classList.add('visible');
+      }, 400);
+    }
+  </script>
+</body>
+</html>
